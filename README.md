@@ -106,6 +106,7 @@
 
 ## 🔍 Information Gathering Tools
 
+- [Darkmoon](https://github.com/ASCIT31/Dark-Moon) - Open source (GPL-3.0) autonomous AI penetration testing platform covering web, API, Active Directory and Kubernetes, with proof of exploitation.
 - [Network Map (nmap)](https://github.com/nmap/nmap)
 - [Dracnmap](https://github.com/Screetsec/Dracnmap)
 - Port scanning
