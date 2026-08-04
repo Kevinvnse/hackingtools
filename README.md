@@ -425,7 +425,7 @@ hackingtool --engagement acme --ai-summary      # opt-in triage of the REAL find
 hackingtool --engagement acme --ai-report       # opt-in narrative draft (report.draft.md)
 ```
 
-Out-of-scope targets are flagged and logged before anything runs, and the AI passes
+Out-of-scope targets are flagged and logged before anything runs, and AI summaries
 only ever summarize findings that exist.
 
 ---
