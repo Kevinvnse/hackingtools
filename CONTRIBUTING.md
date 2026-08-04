@@ -35,7 +35,7 @@ make check            # ruff (must-fix lint) + pytest + catalog/schema validatio
 ```
 
 This is the exact script CI and the pre-push hook run (`scripts/check.sh`). A PR is
-reviewed as a rubber-stamp of a green gate — so **make it green and add a check for
+reviewed as a rubber stamp of a green gate — so **make it green and add a check for
 non-trivial logic** (an `assert`-based self-check or a small `test_*.py`).
 
 ## Adding a tool
