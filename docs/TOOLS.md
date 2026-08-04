@@ -163,7 +163,7 @@ Back to the [README](../README.md) · [How to use hackingtool](HOW-TO-USE.md)
 - Autopsy — <sub>forensics, metadata</sub>
 - Wireshark — <sub>network, forensics, sniffing, pcap</sub>
 - [Bulk extractor](https://github.com/simsong/bulk_extractor) — <sub>forensics, memory-dump, metadata</sub>
-- [Disk Clone and ISO Image Acquire](https://guymager.sourceforge.io/) — <sub>forensics, binary</sub>
+- [Disk Clone and ISO Image Acquisition](https://guymager.sourceforge.io/) — <sub>forensics, binary</sub>
 - [Toolsley](https://www.toolsley.com/) — <sub>reference, online-service, forensics</sub>
 - [Volatility 3 (Memory Forensics)](https://github.com/volatilityfoundation/volatility3) — <sub>forensics, memory-dump, malware-analysis</sub>
 - [Binwalk (Firmware Analysis)](https://github.com/ReFirmLabs/binwalk) — <sub>forensics, binary, reversing</sub>
