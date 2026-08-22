@@ -7,7 +7,8 @@ degrades to a stdlib keyword matcher.
 
 Transport (opt-in): provider/model/base-url come from ``config`` (set via
 ``/config`` or ``HACKINGTOOL_AI_*`` env/.env; env wins). ``ai_provider`` picks
-BYO-key OpenAI-compatible endpoint vs local Ollama; the API key is env/.env only.
+BYO-key OpenAI-compatible endpoint vs the named OrcaRouter gateway vs local
+Ollama; the API key is env/.env only.
 """
 import difflib
 import json
@@ -19,6 +20,7 @@ from hackingtool import config, skill
 from hackingtool.tags import TAXONOMY
 
 _OLLAMA_URL = "http://localhost:11434/api/generate"
+_ORCAROUTER_URL = "https://api.orcarouter.ai/v1"   # named gateway provider
 
 # Shared operator charter (persona + safety + anti-fabrication) + AI1 output contract.
 _PROMPT = skill.charter() + "\n\n" + (
@@ -60,16 +62,14 @@ def _ollama(prompt: str) -> str | None:
         return None
 
 
-def _byo_key(prompt: str) -> str | None:
-    """OpenAI-compatible chat completion (OpenAI / Groq / local, etc.). Base URL from
-    config; key is env/.env only. Returns None when either is unset."""
-    base = config.ai_base_url()
-    key = config.ai_key()
+def _chat_completions(base: str, model: str, key: str, prompt: str) -> str | None:
+    """OpenAI-compatible chat completion against ``base``. Returns the assistant
+    text, or None on any transport/parse failure (the caller decides fallback)."""
     if not (base and key):
         return None
     url = base.rstrip("/") + "/chat/completions"
     payload = json.dumps({
-        "model": config.ai_model(),
+        "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0,
     }).encode()
@@ -85,11 +85,29 @@ def _byo_key(prompt: str) -> str | None:
         return None
 
 
+def _byo_key(prompt: str) -> str | None:
+    """OpenAI-compatible chat completion (OpenAI / Groq / local, etc.). Base URL from
+    config; key is env/.env only. Returns None when either is unset."""
+    return _chat_completions(config.ai_base_url(), config.ai_model(),
+                             config.ai_key(), prompt)
+
+
+def _orcarouter(prompt: str) -> str | None:
+    """Named OrcaRouter transport — OpenAI-compatible gateway (adaptive routing,
+    automatic failover, zero-markup inference) at ``_ORCAROUTER_URL``. Uses the
+    same BYO key/model as the generic path; no ``ai_base_url`` needed."""
+    return _chat_completions(_ORCAROUTER_URL, config.ai_model(),
+                             config.ai_key(), prompt)
+
+
 def ask(prompt: str) -> str | None:
-    """Opt-in transport gated by config ``ai_provider``: 'auto' tries BYO-key then
-    Ollama (current behaviour); 'ollama' forces local; 'openai-compat' forces BYO.
+    """Opt-in transport gated by config ``ai_provider``: 'orcarouter' uses the
+    named OrcaRouter gateway; 'auto' tries BYO-key then Ollama (current
+    behaviour); 'ollama' forces local; 'openai-compat' forces BYO.
     ``None`` when nothing is reachable."""
     provider = config.ai_provider()
+    if provider == "orcarouter":
+        return _orcarouter(prompt)
     reply = None
     if provider != "ollama":
         reply = _byo_key(prompt)
@@ -103,13 +121,16 @@ def test_connection() -> tuple[bool, str]:
     failure reason (HTTP status / unreachable) instead of ask()'s silent None.
     Returns (ok, human-readable detail). Mirrors ask()'s provider selection."""
     provider = config.ai_provider()
+    if provider == "orcarouter":
+        return _probe_orcarouter()
     use_byo = provider == "openai-compat" or (
         provider == "auto" and bool(config.ai_base_url()) and bool(config.ai_key()))
     return _probe_byo() if use_byo else _probe_ollama()
 
 
-def _probe_byo() -> tuple[bool, str]:
-    base, key, model = config.ai_base_url(), config.ai_key(), config.ai_model()
+def _probe_endpoint(base: str, key: str, model: str) -> tuple[bool, str]:
+    """Probe one OpenAI-compatible endpoint with a tiny prompt; return the real
+    failure reason (HTTP status / unreachable) instead of a silent failure."""
     if not base:
         return False, "ai_base_url is empty — set it via /config (e.g. https://api.anthropic.com/v1)."
     if not key:
@@ -131,6 +152,15 @@ def _probe_byo() -> tuple[bool, str]:
         return False, f"cannot reach {url} — {e}"
     except (ValueError, KeyError, IndexError) as e:
         return False, f"unexpected response from {url} — {e}"
+
+
+def _probe_byo() -> tuple[bool, str]:
+    base, key, model = config.ai_base_url(), config.ai_key(), config.ai_model()
+    return _probe_endpoint(base, key, model)
+
+
+def _probe_orcarouter() -> tuple[bool, str]:
+    return _probe_endpoint(_ORCAROUTER_URL, config.ai_key(), config.ai_model())
 
 
 def _probe_ollama() -> tuple[bool, str]:

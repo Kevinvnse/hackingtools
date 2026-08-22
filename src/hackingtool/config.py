@@ -55,7 +55,7 @@ _ENV_TEMPLATE = """\
 # HACKINGTOOL_AI_KEY=sk-ant-your-key-here
 
 # ── AI transport ── these mirror /config (config.json); env wins if set ──
-# HACKINGTOOL_AI_PROVIDER=openai-compat            # auto | ollama | openai-compat
+# HACKINGTOOL_AI_PROVIDER=openai-compat            # auto | ollama | openai-compat | orcarouter
 # HACKINGTOOL_AI_BASE_URL=https://api.anthropic.com/v1
 # HACKINGTOOL_AI_MODEL=claude-haiku-4-5-20251001
 
@@ -103,7 +103,7 @@ def get_sudo_cmd() -> str:
 _READONLY = {"version"}                       # never editable at runtime
 _ENUMS = {                                    # fixed string domains
     "background_runner": {"auto", "off"},
-    "ai_provider": {"auto", "ollama", "openai-compat"},
+    "ai_provider": {"auto", "ollama", "openai-compat", "orcarouter"},
     "theme": set(THEME_CHOICES),              # applies on next launch
 }
 _BOOLS = {"show_archived"}                     # boolean-valued keys

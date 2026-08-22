@@ -1,4 +1,6 @@
 """AI1 recommend: taxonomy guardrail, keyword fallback, transport degrade."""
+import json
+
 import hackingtool.ai_recommend as ai_recommend
 import hackingtool.tags as tags
 
@@ -27,6 +29,52 @@ def test_suggest_tags_none_when_unreachable(monkeypatch):
     monkeypatch.setattr(ai_recommend, "_byo_key", lambda p: None)
     monkeypatch.setattr(ai_recommend, "_ollama", lambda p: None)
     assert ai_recommend.suggest_tags("crack a hash") is None
+
+
+def test_ask_uses_orcarouter_when_configured(monkeypatch):
+    from hackingtool import config
+    monkeypatch.setattr(config, "ai_provider", lambda: "orcarouter")
+    hits = {}
+    monkeypatch.setattr(ai_recommend, "_orcarouter",
+                        lambda p: hits.setdefault("asked", p))
+    assert ai_recommend.ask("find subdomains") == "find subdomains"
+    assert hits.get("asked") == "find subdomains"
+
+
+def test_orcarouter_posts_to_gateway(monkeypatch):
+    from hackingtool import config
+    monkeypatch.setattr(config, "ai_model", lambda: "some-model")
+    monkeypatch.setattr(config, "ai_key", lambda: "sk-test")
+
+    def _capture(req, timeout=60):
+        assert req.full_url == "https://api.orcarouter.ai/v1/chat/completions"
+        body = json.loads(req.data)
+        assert body["model"] == "some-model"
+        assert req.headers.get("Authorization") == "Bearer sk-test"
+        return _FakeResp(b'{"choices":[{"message":{"content":"ok"}}]}')
+
+    monkeypatch.setattr(ai_recommend.urllib.request, "urlopen", _capture)
+    assert ai_recommend._orcarouter("hi") == "ok"
+
+
+def test_probe_orcarouter_ok(monkeypatch):
+    from hackingtool import config
+    monkeypatch.setattr(config, "ai_provider", lambda: "orcarouter")
+    monkeypatch.setattr(config, "ai_key", lambda: "sk-test")
+    monkeypatch.setattr(config, "ai_model", lambda: "m")
+    body = b'{"choices":[{"message":{"content":"connected"}}]}'
+    monkeypatch.setattr(ai_recommend.urllib.request, "urlopen",
+                        lambda req, timeout=30: _FakeResp(body))
+    ok, detail = ai_recommend.test_connection()
+    assert ok and "connected" in detail
+
+
+def test_test_connection_orcarouter_missing_key(monkeypatch):
+    from hackingtool import config
+    monkeypatch.setattr(config, "ai_provider", lambda: "orcarouter")
+    monkeypatch.setattr(config, "ai_key", lambda: "")
+    ok, detail = ai_recommend.test_connection()
+    assert not ok and "HACKINGTOOL_AI_KEY" in detail
 
 
 def test_suggest_tags_filters_model_reply(monkeypatch):

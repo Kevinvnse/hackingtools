@@ -407,8 +407,9 @@ No tmux? It says so and opens the tool inline instead; disable it entirely with
 prompt. Settings live in `~/.hackingtool/config.json`.
 
 The AI layer is **opt-in and bring-your-own-key**: an OpenAI-compatible endpoint when
-`ai_base_url` + an API key are set, else a local [Ollama](https://ollama.com), else
-nothing — every feature degrades to a deterministic offline behaviour instead of
+`ai_base_url` + an API key are set, the named [OrcaRouter](https://www.orcarouter.ai)
+gateway when `ai_provider` is `orcarouter`, a local [Ollama](https://ollama.com),
+or nothing — every feature degrades to a deterministic offline behaviour instead of
 guessing. Your API key is written only to `~/.hackingtool/.env` (mode 600), never to
 `config.json`, and never printed back. `/config test` reports the real failure if a
 probe fails.

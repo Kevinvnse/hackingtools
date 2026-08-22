@@ -253,6 +253,18 @@ commands come from the curated cheatsheets.
 2. Leave `ai_base_url` empty and set `ai_model` to the model you pulled.
 3. `/config test` to confirm.
 
+**Option C — OrcaRouter (named gateway provider)**
+
+[OrcaRouter](https://www.orcarouter.ai) is an OpenAI-compatible gateway that routes
+to many models behind one endpoint. Pick `orcarouter` as the `ai_provider` and the
+tool uses the gateway URL directly — no `ai_base_url` needed:
+
+1. In `/config`, cycle `ai_provider` to `orcarouter` (or set
+   `HACKINGTOOL_AI_PROVIDER=orcarouter`).
+2. Set `ai_model` to the model you want to route to, and set `ai_key` (masked,
+   saved to `~/.hackingtool/.env`).
+3. `/config test` to confirm — `/goal` then uses the same gateway.
+
 Any key can also be set in one line, e.g. `/config theme cyan`,
 `/config show_archived true`, `/config background_runner off`. Environment
 variables (`HACKINGTOOL_AI_BASE_URL`, `HACKINGTOOL_AI_MODEL`,

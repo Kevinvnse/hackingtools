@@ -230,8 +230,8 @@ def demo():
     prov = next(r for r in _rows() if r["key"] == "ai_provider")
     assert prov["kind"] == "choice"
     assert _cycle_choice("auto", prov["choices"]) in prov["choices"]
-    assert _cycle_choice("auto", ["auto", "ollama", "openai-compat"]) == "ollama"    # →
-    assert _cycle_choice("auto", ["auto", "ollama", "openai-compat"], -1) == "openai-compat"  # ← wraps
+    assert _cycle_choice("auto", ["auto", "ollama", "openai-compat", "orcarouter"]) == "ollama"    # →
+    assert _cycle_choice("auto", ["auto", "ollama", "openai-compat", "orcarouter"], -1) == "orcarouter"  # ← wraps
     assert _cycle_choice("bogus", ["auto", "off"]) == "auto"  # unknown → first
     print("OK — config_ui: rows + cycle")
 

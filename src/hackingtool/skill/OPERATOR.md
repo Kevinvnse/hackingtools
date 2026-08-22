@@ -56,7 +56,8 @@ completes `/` commands, `@` tool names, and `@tag:` tags. `↑`/`↓` walk histo
 ## AI features (AI1–AI4) and how each is grounded
 
 The AI layer is opt-in and BYO-key: it uses an OpenAI-compatible endpoint when
-`HACKINGTOOL_AI_BASE_URL` + `HACKINGTOOL_AI_KEY` are set, else a local Ollama, else
+`HACKINGTOOL_AI_BASE_URL` + `HACKINGTOOL_AI_KEY` are set, the named OrcaRouter
+gateway when `HACKINGTOOL_AI_PROVIDER=orcarouter`, else a local Ollama, else
 nothing. When no model is reachable each feature degrades to a deterministic,
 offline behavior — it never blocks and never invents.
 

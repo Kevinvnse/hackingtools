@@ -138,7 +138,7 @@ def test_config_ui_rows(tmp_cfg):
     rows = config_ui._rows()
     by_key = {r["key"]: r for r in rows}
     assert by_key["ai_provider"]["kind"] == "choice"
-    assert set(by_key["ai_provider"]["choices"]) == {"auto", "ollama", "openai-compat"}
+    assert set(by_key["ai_provider"]["choices"]) == {"auto", "ollama", "openai-compat", "orcarouter"}
     assert by_key["theme"]["kind"] == "choice"          # theme is now arrow-selectable
     assert "magenta" in by_key["theme"]["choices"]
     assert by_key["version"]["kind"] == "readonly"
@@ -148,10 +148,10 @@ def test_config_ui_rows(tmp_cfg):
 
 def test_config_ui_cycle():
     from hackingtool import config_ui
-    c = ["auto", "ollama", "openai-compat"]
+    c = ["auto", "ollama", "openai-compat", "orcarouter"]
     assert config_ui._cycle_choice("auto", c) == "ollama"          # → forward
-    assert config_ui._cycle_choice("openai-compat", c) == "auto"   # → wraps
-    assert config_ui._cycle_choice("auto", c, -1) == "openai-compat"  # ← wraps back
+    assert config_ui._cycle_choice("orcarouter", c) == "auto"      # → wraps
+    assert config_ui._cycle_choice("auto", c, -1) == "orcarouter"  # ← wraps back
     assert config_ui._cycle_choice("ollama", c, -1) == "auto"      # ← backward
     assert config_ui._cycle_choice("bogus", c) == "auto"           # unknown → first
 

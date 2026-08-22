@@ -81,7 +81,7 @@ DEFAULT_CONFIG: dict = {
     "theme":          "magenta",
     "show_archived":  False,
     "background_runner": "auto",   # "auto" (on iff tmux present) | "off"
-    "ai_provider":    "auto",      # "auto" (BYO-key if set, else Ollama) | "ollama" | "openai-compat"
+    "ai_provider":    "auto",      # "auto" (BYO-key if set, else Ollama) | "ollama" | "openai-compat" | "orcarouter"
     "ai_model":       "llama3",    # model name sent to the transport
     "ai_base_url":    "",          # OpenAI-compatible endpoint (blank = local Ollama)
     "sudo_binary":    "sudo",
