@@ -46,6 +46,7 @@ from pathlib import Path
 # Reuse the auditor's battle-tested helpers rather than re-implementing them.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from audit_tools import ROOT, gh_repo, load_token, parse_tools  # noqa: E402
+from _common import SKIP_OWNERS  # noqa: E402
 
 sys.path.insert(0, str(ROOT))
 from hackingtool.tags import TAXONOMY  # noqa: E402
@@ -56,10 +57,6 @@ REPORT_MD = ROOT / "scripts" / "discovered_tools.md"
 STUBS_YAML = ROOT / "scripts" / "discovered_candidates.yaml"
 
 GH_LINK_RE = re.compile(r"github\.com/([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)")
-# Owners that are platforms/orgs, not tools — links to these are noise in a list.
-SKIP_OWNERS = {"sponsors", "topics", "search", "about", "features", "marketplace",
-               "collections", "orgs", "settings", "notifications"}
-
 # repo topic / keyword -> canonical taxonomy tag (only mappings we're confident of).
 TOPIC_MAP = {
     "osint": "osint", "recon": "recon", "reconnaissance": "recon",

@@ -10,14 +10,13 @@ A test asserts the committed file matches a fresh run, so it cannot rot.
 import re
 from pathlib import Path
 
+from _common import SKIP_OWNERS
+
 SRC = Path(__file__).resolve().parent.parent / "src" / "hackingtool"
 OUT = SRC / "catalog_owners.py"
 # (?<!api\.) drops api.github.com/... URLs entirely (e.g. .../repos/mozilla/...,
 # .../search/repositories) rather than misreading their path segments as owners.
 _URL = re.compile(r"(?<!api\.)github\.com/([A-Za-z0-9._-]+)/[A-Za-z0-9._-]+")
-# Path segments that land right after github.com/ in non-owner URLs (placeholder
-# docs, API paths that slipped past the api. filter) — never real owners.
-_NOT_OWNERS = {"search", "repos", "orgs", "org"}
 
 HEADER = '''"""GitHub owners of tools we already ship — GENERATED, do not edit.
 
@@ -33,7 +32,7 @@ def collect() -> list[str]:
     for p in sorted(SRC.rglob("*")):
         if p.suffix in (".yaml", ".py") and p.is_file() and p.name != OUT.name:
             found = _URL.findall(p.read_text(errors="ignore"))
-            owners.update(o for o in found if o.lower() not in _NOT_OWNERS)
+            owners.update(o for o in found if o.lower() not in SKIP_OWNERS)
     return sorted(owners, key=str.lower)
 
 
