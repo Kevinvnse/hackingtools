@@ -6,7 +6,6 @@ USAGE = [
     ("show already-cracked results", "hashcat -m 0 hash.txt --show"),
 ]
 
-
 def test_curated_match_returns_exact_command():
     src, cmd = ai_command.build_command("Hashcat", USAGE, "crack an md5 with a wordlist")
     assert src == "curated"
