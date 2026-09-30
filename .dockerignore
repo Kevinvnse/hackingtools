@@ -6,6 +6,9 @@
 .github/
 images/
 *.md
+# ...but the Dockerfile needs README.md: pyproject.toml sets readme = "README.md",
+# which pip reads during `pip install .`.
+!README.md
 
 # Python cache
 __pycache__/
