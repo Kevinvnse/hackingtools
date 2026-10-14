@@ -12,9 +12,23 @@ into the right tool and the exact command**.
 OSINT researchers · bug-bounty hunters · CTF players · security researchers and
 students — all working **legally, on systems they own or are authorised to test**.
 
-<a href="https://trendshift.io/repositories/869" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/869" alt="Z4nzu/hackingtool | Trendshift" width="250" height="55"/></a> <a href="https://trendshift.io/repositories/869" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/869/daily?language=Python" alt="Z4nzu/hackingtool | Trendshift daily" width="250" height="55"/></a> <a href="https://trendshift.io/repositories/869" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/869/weekly" alt="Z4nzu/hackingtool | Trendshift weekly" width="250" height="55"/></a>
+<div align="center">
+  <sub>Sponsored by</sub><br>
+  <a href="https://webvetted.com/hacking-tools?utm_source=github&utm_medium=sponsor&utm_campaign=hacking-tools">
+    <img width="800" alt="WebVetted Intelligence - OSINT & Recon Platform" src="https://github.com/user-attachments/assets/75b9480e-52ce-4096-bee9-69a26d7823a1" />
+  </a>
+  <br><br>
+  <i><b>Go beyond manual recon.</b> WebVetted turns an email, phone or username into a complete identity investigation with deep OSINT enrichment, breach intel, AI analysis, and an interactive identity graph.</i><br>
+  <br>
+  <a href="https://webvetted.com/hacking-tools?utm_source=github&utm_medium=sponsor&utm_campaign=hacking-tools"><b>Start an Investigation →</b></a>
+</div>
 
 <br/><br/>
+
+
+<a href="https://trendshift.io/repositories/869" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/869" alt="Z4nzu/hackingtool | Trendshift" width="250" height="55"/></a> <a href="https://trendshift.io/repositories/869" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/869/daily?language=Python" alt="Z4nzu/hackingtool | Trendshift daily" width="250" height="55"/></a> <a href="https://trendshift.io/repositories/869" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/869/weekly" alt="Z4nzu/hackingtool | Trendshift weekly" width="250" height="55"/></a>
+
+<br/>
 
 [![License](https://img.shields.io/github/license/Z4nzu/hackingtool?style=flat-square&labelColor=0D1117&color=7B61FF)](LICENSE) [![Python](https://img.shields.io/badge/Python-3.10+-0D1117?style=flat-square&labelColor=0D1117&logo=python&logoColor=7B61FF)](https://www.python.org/) [![Stars](https://img.shields.io/github/stars/Z4nzu/hackingtool?style=flat-square&labelColor=0D1117&color=7B61FF)](https://github.com/Z4nzu/hackingtool/stargazers) [![Forks](https://img.shields.io/github/forks/Z4nzu/hackingtool?style=flat-square&labelColor=0D1117&color=7B61FF)](https://github.com/Z4nzu/hackingtool/network/members) [![Issues](https://img.shields.io/github/issues/Z4nzu/hackingtool?style=flat-square&labelColor=0D1117&color=7B61FF)](https://github.com/Z4nzu/hackingtool/issues) [![Last Commit](https://img.shields.io/github/last-commit/Z4nzu/hackingtool?style=flat-square&labelColor=0D1117&color=7B61FF)](https://github.com/Z4nzu/hackingtool/commits/master) [![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-DB61A2?style=flat-square&labelColor=0D1117&logo=githubsponsors&logoColor=DB61A2)](#support--sponsor)
 
