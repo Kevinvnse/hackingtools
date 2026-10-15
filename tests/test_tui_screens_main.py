@@ -7,6 +7,7 @@ from hackingtool.tui import data
 from hackingtool.tui.screens.main import MainScreen
 from hackingtool.tui.screens.category import CategoryScreen
 from hackingtool.tui.screens.tool import ToolScreen
+from hackingtool.tui.widgets import banner
 
 
 class _App(App):
@@ -83,12 +84,17 @@ def test_enter_on_global_search_hit_opens_tool():
     asyncio.run(run())
 
 
-def test_prompt_docked_bottom_list_fills_middle():
+def test_prompt_docked_bottom_list_fills_middle(monkeypatch):
     # Header pinned top, list in the middle, prompt pinned bottom: the screen
     # tiles instead of scrolling as a page. Verified at a short height.
+    # No update line (it arrives async and re-lays-out the banner mid-assert).
+    monkeypatch.setattr(banner.update_check, "latest_if_newer", lambda *a, **k: None)
+
     async def run():
         async with _App().run_test(size=(80, 20)) as pilot:
             await _until_screen(pilot, MainScreen)
+            await pilot.pause()
+            await pilot.pause()
             scr = pilot.app.screen
             prompt = scr.query_one("#ht-prompt", Input)
             ol = scr.query_one("#main-cats", OptionList)
