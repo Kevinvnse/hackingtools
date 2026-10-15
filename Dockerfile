@@ -26,8 +26,9 @@ COPY src ./src
 # Patch the base image's system pip (CVE-2026-13346, fixed in 26.2.0) and drop its
 # old dist-info so scanners stop flagging it, then install with the upgraded pip.
 RUN --mount=type=cache,target=/root/.cache/pip \
+    rm -rf /usr/lib/python3/dist-packages/pip-*.dist-info && \
     python3 -m pip install --break-system-packages --upgrade "pip>=26.2" && \
-    rm -rf /usr/lib/python3/dist-packages/pip /usr/lib/python3/dist-packages/pip-*.dist-info && \
+    rm -rf /usr/lib/python3/dist-packages/pip && \
     python3 -m pip install --break-system-packages .
 
 # Tools install their payloads at runtime under here; persist via a volume.
