@@ -1,7 +1,7 @@
 # Tool catalog
 
-Every tool hackingtool can install, launch, or point you at — **215 active tools
-across 21 categories**, plus 59 archived entries kept out of this list (they are
+Every tool hackingtool can install, launch, or point you at — **219 active tools
+across 21 categories**, plus 44 archived entries kept out of this list (they are
 unmaintained or dead upstream and are hidden in the app unless you set
 `show_archived true` via `/config`).
 
