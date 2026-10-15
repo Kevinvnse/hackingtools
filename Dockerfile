@@ -23,8 +23,12 @@ COPY src ./src
 # PEP 668 (externally-managed) on Kali → --break-system-packages. This installs
 # the `hackingtool` console script onto PATH and ships catalog/*.yaml +
 # pipelines/*.yaml as package data (resolved at runtime via __file__).
+# Patch the base image's system pip (CVE-2026-13346, fixed in 26.2.0) and drop its
+# old dist-info so scanners stop flagging it, then install with the upgraded pip.
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip3 install --break-system-packages .
+    python3 -m pip install --break-system-packages --upgrade "pip>=26.2" && \
+    rm -rf /usr/lib/python3/dist-packages/pip /usr/lib/python3/dist-packages/pip-*.dist-info && \
+    python3 -m pip install --break-system-packages .
 
 # Tools install their payloads at runtime under here; persist via a volume.
 RUN mkdir -p /root/.hackingtool/tools
