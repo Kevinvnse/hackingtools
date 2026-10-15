@@ -77,9 +77,9 @@ students — all working **legally, on systems they own or are authorised to tes
   plans an objective step by step, then summarizes findings and drafts an engagement
   report. Bring your own key or run a local model — nothing auto-executes and nothing
   is fabricated.
-- **🗂 215 curated tools, one console** — install and run across 21 categories without
-  hunting down Git repos; a fixed tag taxonomy (63 tags in use) makes every tool
-  discoverable.
+- **🗂 215 curated tools, one interactive console** — type to search every tool, then
+  install and run across 21 categories without hunting down Git repos; a fixed tag
+  taxonomy (63 tags in use) makes every tool discoverable.
 - **🔎 It knows what it doesn't have** — `/find` searches your catalog first, then the
   GitHub API, and shows real maintained projects with the reason each was ranked.
 - **🛡 Safe by default** — standard installs, **no `curl | bash`**, downloads pinned +
@@ -89,9 +89,9 @@ students — all working **legally, on systems they own or are authorised to tes
   forensics/IR — all on **authorized targets only**.
 
 <div align="center">
-<img src="images/screenshots/1.png" alt="hackingtool console: banner with live system readout and the / command palette" width="900">
+<img src="images/screenshots/1.png" alt="hackingtool interactive TUI: categories with live tool counts, type to search all tools, / opens the command palette" width="900">
 <br/>
-<sub>The console on launch — live system readout, and <code>/</code> opens the command palette.</sub>
+<sub>The interactive console on launch — browse categories, type to search every tool, and <code>/</code> opens the command palette.</sub>
 </div>
 
 ---
@@ -263,7 +263,13 @@ Some individual tools need a language runtime to install/run; the core app doesn
 
 ## Quick Commands
 
-Launch `hackingtool` and type. There are only three kinds of input:
+`hackingtool` opens an **interactive terminal UI**: browse the categories, **type to
+search every tool** across all of them, `↑↓` to move, `Enter` to open, `←`/`Esc` to go
+back, and `/` for the command palette (`/config`, `/update`, `/menu`, `/quit`). When a
+newer release is out it shows an *update available* line on launch, and `/update`
+detects how you installed hackingtool and shows the exact upgrade command to run.
+
+For a keyboard-driven REPL instead, `hackingtool --classic` takes three kinds of input:
 
 | You type | It means | Example |
 |---|---|---|
@@ -311,9 +317,9 @@ Inside a tool: `1` install · `2` run · `c` ask for the exact command for your 
 <sub><code>/help</code> — the same card, in the app.</sub>
 </div>
 
-On a non-interactive terminal (or without `prompt_toolkit`) hackingtool falls back to
-the classic numbered menu, where `/` or `s` searches, `t` filters by tag, `r` or `a`
-recommends, `?` helps and `q` quits. Force it with `hackingtool --classic`.
+The command set above is the `--classic` REPL. On a non-interactive terminal hackingtool
+falls back to the classic numbered menu, where `/` or `s` searches, `t` filters by tag,
+`r` or `a` recommends, `?` helps and `q` quits.
 
 > **New here?** [docs/HOW-TO-USE.md](docs/HOW-TO-USE.md) walks through each of these
 > start to finish with numbered steps.
@@ -416,9 +422,10 @@ No tmux? It says so and opens the tool inline instead; disable it entirely with
 
 ### ⚙ Settings and the AI layer
 
-`/config` opens a full-screen settings editor (`↑↓` move, `←→` change, `Enter` edit,
-`t` test the connection, `Esc` close); `/config <key> <value>` sets one key from the
-prompt. Settings live in `~/.hackingtool/config.json`.
+`/config` opens a searchable settings screen — type to filter, `↑↓` move, `Enter` cycles
+a choice or edits a value (auto-saved), `←`/`Esc` back; in `--classic` it's a full-screen
+editor with `t` to test the AI connection. `/config <key> <value>` sets one key directly.
+Settings live in `~/.hackingtool/config.json`.
 
 The AI layer is **opt-in and bring-your-own-key**: an OpenAI-compatible endpoint when
 `ai_base_url` + an API key are set, else a local [Ollama](https://ollama.com), else

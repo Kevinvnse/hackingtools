@@ -86,7 +86,7 @@ class HTCompleter:
 
 
 def _resolve(name, tools_by_title):
-    """Case-insensitive lookup with a fuzzy fallback (difflib, 0.6 cutoff)."""
+    """Exact title, then canonical binary name (SYSTEM_PKGS['which']), then fuzzy (difflib)."""
     import difflib
 
     name = name.strip()
@@ -95,6 +95,12 @@ def _resolve(name, tools_by_title):
     lower = {t.lower(): tool for t, tool in tools_by_title.items()}
     if name.lower() in lower:
         return lower[name.lower()]
+    # canonical binary alias: `@nmap` → the tool whose `which` is nmap, before fuzzy
+    # matching can mis-hit (e.g. nmap/sqlmap → "NoSqlMap"). Only when unambiguous.
+    canon = [tool for tool in tools_by_title.values()
+             if str((getattr(tool, "SYSTEM_PKGS", None) or {}).get("which") or "").lower() == name.lower()]
+    if len(canon) == 1:
+        return canon[0]
     hit = difflib.get_close_matches(name.lower(), lower.keys(), n=1, cutoff=0.6)
     return lower[hit[0]] if hit else None
 

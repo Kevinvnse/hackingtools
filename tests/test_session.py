@@ -123,11 +123,14 @@ def test_kill_window(rec):
 
 def test_no_crash_when_tmux_binary_missing(monkeypatch):
     """Verify session functions degrade gracefully when tmux binary is absent."""
+    import pytest
     def boom(*a, **k):
         raise FileNotFoundError("tmux")
     monkeypatch.setattr(session.subprocess, "run", boom)
     monkeypatch.setattr(session, "windows", lambda: [])
-    # must not raise
+    # cleanup helpers still degrade silently
     session.kill("nmap")
     session.kill("all")
-    assert session.run("x", "/tmp") == "x"
+    # run() now SIGNALS the failure (caller reports it) instead of pretending it started
+    with pytest.raises(session.SessionError):
+        session.run("x", "/tmp")

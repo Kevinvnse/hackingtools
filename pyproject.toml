@@ -11,7 +11,7 @@ requires-python = ">=3.10"                  # floor: code uses 3.10 union syntax
 license = { text = "MIT" }
 authors = [{ name = "Z4nzu" }]
 keywords = ["security", "pentesting", "hacking", "recon", "osint", "cli"]
-dependencies = ["rich>=13.0.0", "pyyaml>=6.0", "platformdirs>=4.0", "prompt_toolkit>=3.0.0", "python-dotenv>=1.0.0"]
+dependencies = ["rich>=13.0.0", "pyyaml>=6.0", "platformdirs>=4.0", "prompt_toolkit>=3.0.0", "python-dotenv>=1.0.0", "textual>=8.2"]
 
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -50,7 +50,7 @@ dev = ["pytest>=8", "ruff>=0.6"]
 where = ["src"]
 
 [tool.setuptools.package-data]
-hackingtool = ["catalog/*.yaml", "pipelines/*.yaml", "skill/*.md"]
+hackingtool = ["catalog/*.yaml", "pipelines/*.yaml", "skill/*.md", "tui/*.tcss", "sponsors.yaml"]
 
 [tool.setuptools.dynamic]
 version = { attr = "hackingtool.constants.VERSION" }

@@ -37,7 +37,11 @@ def _run(args: list[str], capture: bool = False) -> subprocess.CompletedProcess:
             ["tmux", *args], capture_output=capture, text=True, check=False,
         )
     except FileNotFoundError:
-        return subprocess.CompletedProcess(["tmux", *args], 1, "", "")
+        return subprocess.CompletedProcess(["tmux", *args], 1, "", "tmux executable not found")
+
+
+class SessionError(RuntimeError):
+    """A background tmux window/session could not be created or fed its command."""
 
 
 def _has_session() -> bool:
@@ -85,14 +89,18 @@ def run(label: str, cwd: str, command: str | None = None,
     """
     label = _unique_label(label)
     if _has_session():
-        _run(["new-window", "-t", SESSION, "-n", label, "-c", cwd])
+        res = _run(["new-window", "-t", SESSION, "-n", label, "-c", cwd], capture=True)
     else:
-        _run(["new-session", "-d", "-s", SESSION, "-n", label, "-c", cwd])
+        res = _run(["new-session", "-d", "-s", SESSION, "-n", label, "-c", cwd], capture=True)
+    if res.returncode != 0:
+        raise SessionError((res.stderr or "").strip() or "tmux could not create the window")
     target = f"{SESSION}:{label}"
     if banner:
         _run(["send-keys", "-t", target, f"# {banner}", "Enter"])
     if command:
-        _run(["send-keys", "-t", target, command, "Enter"])
+        res = _run(["send-keys", "-t", target, command, "Enter"], capture=True)
+        if res.returncode != 0:
+            raise SessionError((res.stderr or "").strip() or "tmux could not deliver the command")
     return label
 
 

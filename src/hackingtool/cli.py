@@ -33,6 +33,7 @@ from rich.columns import Columns
 
 from hackingtool.core import HackingToolsCollection, ask, clear_screen, console
 from hackingtool.constants import VERSION_DISPLAY, REPO_WEB_URL, USER_CONFIG_DIR
+from hackingtool import update_check
 from hackingtool.config import get_tools_dir
 import hackingtool.ai_recommend as ai_recommend
 from hackingtool.tools.anonsurf import AnonSurfTools
@@ -294,6 +295,13 @@ def _build_header() -> Panel:
     body.add_row(Text("  ⚠  For authorized security testing only",
                       style="bold dim red"))
 
+    # Cached once-a-day check; prints nothing when up to date, offline, or opted out.
+    if (newer := update_check.latest_if_newer()):
+        body.add_row(Text(
+            f"  ⬆  update available: v{newer}  (you have {VERSION_DISPLAY})  ·  "
+            f"{REPO_WEB_URL}/releases",
+            style="bold yellow"))
+
     return Panel(
         body,
         title=f"[bold bright_magenta][ HackingTool {VERSION_DISPLAY} ][/bold bright_magenta]",
@@ -409,14 +417,14 @@ def _tool_table(matches, title):
     for i, (tool, cat) in enumerate(matches, start=1):
         status = "[green]✔[/green]" if tool.is_installed else "[dim]✘[/dim]"
         table.add_row(str(i), status, tool.TITLE, cat)
-    table.add_row("99", "", "Back to main menu", "")
+    table.add_row("b", "", "Back to main menu", "")
     console.print(table)
 
 
 def _pick_tool(matches):
-    """Prompt for a number and open that tool; ignore blank/99/invalid."""
+    """Prompt for a number and open that tool; ignore blank/back/invalid."""
     raw = ask("[bold cyan]>[/bold cyan]", default="").strip()
-    if not raw or raw == "99":
+    if not raw or raw.lower() in ("b", "back"):
         return
     try:
         idx = int(raw)
@@ -583,7 +591,7 @@ def search_tools(query: str | None = None):
         desc = (tool.DESCRIPTION or "—").splitlines()[0]
         table.add_row(str(i), tool.TITLE, cat, desc)
 
-    table.add_row("99", "Back to main menu", "", "")
+    table.add_row("b", "Back to main menu", "", "")
     console.print(table)
 
     _pick_tool(matches)
@@ -805,11 +813,13 @@ def main():
     from hackingtool import prompt
     prompt.FORCE_CLASSIC = force_classic
 
-    if argv and (argv[0] in ("-h", "--help") or any(a.startswith("--") for a in argv)):
-        args = _build_arg_parser().parse_args(argv)   # argparse prints help and exits on -h/--help
+    if argv:
+        # Any argument means headless mode. argparse rejects unknown/typo args with
+        # exit 2 (instead of silently opening the menu); -h/--help exits 0.
+        parser = _build_arg_parser()
+        args = parser.parse_args(argv)
         if not args.engagement:
-            console.print("[bold red]--engagement is required in headless mode.[/bold red]")
-            return
+            parser.error("--engagement is required in headless mode")   # prints usage, exits 2
         _run_headless(args)
         return
     try:
@@ -831,9 +841,15 @@ def main():
         from hackingtool import config
         config.ensure_user_files()   # first run: scaffold config.json + commented .env
 
-        from hackingtool import repl
-        if repl._use_repl(force_classic):
-            repl.run_repl()
+        if force_classic:
+            from hackingtool import repl
+            if repl._use_repl(force_classic):
+                repl.run_repl()
+            else:
+                interact_menu()
+        elif sys.stdin.isatty() and sys.stdout.isatty():
+            from hackingtool.tui import app as tui_app
+            tui_app.run()
         else:
             interact_menu()
 

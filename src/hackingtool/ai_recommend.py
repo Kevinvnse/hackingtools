@@ -37,7 +37,7 @@ def _tokens(text: str) -> set[str]:
 
 def _parse_tags(reply: str | None) -> list[str]:
     """Pull a JSON array of strings from a model reply; keep only real tags."""
-    if not reply:
+    if not isinstance(reply, str) or not reply:   # None / non-str content → no tags
         return []
     m = re.search(r"\[.*\]", reply, re.DOTALL)
     if not m:
@@ -80,7 +80,8 @@ def _byo_key(prompt: str) -> str | None:
     try:
         with urllib.request.urlopen(req, timeout=60) as resp:
             data = json.loads(resp.read())
-        return data["choices"][0]["message"]["content"]
+        content = data["choices"][0]["message"]["content"]
+        return content if isinstance(content, str) else None   # null/tool-call content → None
     except (urllib.error.URLError, OSError, ValueError, KeyError, IndexError):
         return None
 
@@ -105,7 +106,16 @@ def test_connection() -> tuple[bool, str]:
     provider = config.ai_provider()
     use_byo = provider == "openai-compat" or (
         provider == "auto" and bool(config.ai_base_url()) and bool(config.ai_key()))
-    return _probe_byo() if use_byo else _probe_ollama()
+    if not use_byo:
+        return _probe_ollama()
+    ok, detail = _probe_byo()
+    if ok or provider != "auto":
+        return ok, detail
+    # auto mode mirrors ask(): BYO failed → fall back to local Ollama before reporting failure
+    ok2, detail2 = _probe_ollama()
+    if ok2:
+        return True, f"{detail2} (remote failed: {detail})"
+    return False, f"{detail}; Ollama fallback also failed: {detail2}"
 
 
 def _probe_byo() -> tuple[bool, str]:
@@ -123,8 +133,10 @@ def _probe_byo() -> tuple[bool, str]:
         "Content-Type": "application/json", "Authorization": f"Bearer {key}"})
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
-            reply = json.loads(resp.read())["choices"][0]["message"]["content"].strip()
-        return True, f"{model} replied {reply!r}"
+            content = json.loads(resp.read())["choices"][0]["message"]["content"]
+        if not isinstance(content, str):          # null / tool-call content isn't a usable reply
+            return False, f"unexpected response from {url} — content was {type(content).__name__}, not text"
+        return True, f"{model} replied {content.strip()!r}"
     except urllib.error.HTTPError as e:
         return False, f"HTTP {e.code} from {url} — {e.read().decode(errors='replace')[:200]}"
     except (urllib.error.URLError, OSError) as e:

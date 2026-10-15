@@ -41,16 +41,27 @@ def run_pipeline(e: Engagement, pipeline_name: str = "recon") -> list[findings_m
         stdin = "\n".join(e.targets if step["input"] == "targets" else forward)
         try:
             proc = subprocess.run([tool, *step["args"]], input=stdin,
-                                  capture_output=True, text=True, timeout=STEP_TIMEOUT)
+                                  capture_output=True, text=True, timeout=STEP_TIMEOUT,
+                                  encoding="utf-8", errors="replace")  # a stray non-UTF8 byte must not abort the run
             raw = proc.stdout
             if proc.returncode != 0:
                 tail = (proc.stderr or "").strip().splitlines()[-3:]
                 e.log(f"{tool}: exit {proc.returncode}; stderr: {' | '.join(tail)}")
-        except (subprocess.TimeoutExpired, OSError) as exc:
+        except subprocess.TimeoutExpired as exc:
+            raw = exc.stdout or ""                       # keep records emitted before the deadline
+            if isinstance(raw, bytes):
+                raw = raw.decode("utf-8", "replace")
+            (e.workspace / step["output"]).write_text(raw, encoding="utf-8")
+            parsed, _ = findings_mod.PARSERS[step["parser"]](raw, ts)
+            all_findings.extend(parsed)
+            e.log(f"timeout {tool} after {STEP_TIMEOUT}s; salvaged {len(parsed)} finding(s)")
+            forward = []                                 # incomplete step → don't forward to the next
+            continue
+        except OSError as exc:
             e.log(f"error {tool}: {exc}")
             forward = []
             continue
-        (e.workspace / step["output"]).write_text(raw)
+        (e.workspace / step["output"]).write_text(raw, encoding="utf-8")
         parsed, forward = findings_mod.PARSERS[step["parser"]](raw, ts)
         if e.scope_out:
             kept = []

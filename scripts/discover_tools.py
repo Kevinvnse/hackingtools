@@ -48,7 +48,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from audit_tools import ROOT, gh_repo, load_token, parse_tools  # noqa: E402
 
 sys.path.insert(0, str(ROOT))
-from tags import TAXONOMY  # noqa: E402
+from hackingtool.tags import TAXONOMY  # noqa: E402
 
 CATALOG_DIR = ROOT / "catalog"
 CACHE_FILE = ROOT / "scripts" / ".discover_cache.json"

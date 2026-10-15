@@ -17,7 +17,7 @@ OUT = SRC / "catalog_owners.py"
 _URL = re.compile(r"(?<!api\.)github\.com/([A-Za-z0-9._-]+)/[A-Za-z0-9._-]+")
 # Path segments that land right after github.com/ in non-owner URLs (placeholder
 # docs, API paths that slipped past the api. filter) — never real owners.
-_NOT_OWNERS = {"search", "repos", "orgs", "org"}
+_NOT_OWNERS = {"search", "repos", "orgs", "org", "sponsors"}
 
 HEADER = '''"""GitHub owners of tools we already ship — GENERATED, do not edit.
 

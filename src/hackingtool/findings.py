@@ -33,17 +33,20 @@ def parse_httpx(raw: str, ts: str) -> tuple[list[Finding], list[str]]:
             obj = json.loads(ln)
         except json.JSONDecodeError:
             continue  # skip malformed line, keep going
-        url = obj.get("url") or obj.get("input") or ""
-        if not url:
+        if not isinstance(obj, dict):          # valid JSON but not an object → skip
             continue
+        url = obj.get("url") or obj.get("input") or ""
+        if not isinstance(url, str) or not url:
+            continue
+        title = obj.get("title")
+        title = title if isinstance(title, str) and title else url
         details = {
             "status_code": obj.get("status_code"),
             "title": obj.get("title"),
             "tech": obj.get("tech"),
             "webserver": obj.get("webserver"),
         }
-        findings.append(Finding("service", url, obj.get("title") or url,
-                                "info", "httpx", details, ln, ts))
+        findings.append(Finding("service", url, title, "info", "httpx", details, ln, ts))
         urls.append(url)
     return findings, urls
 
@@ -58,13 +61,23 @@ def parse_nuclei(raw: str, ts: str) -> tuple[list[Finding], list[str]]:
             obj = json.loads(ln)
         except json.JSONDecodeError:
             continue
-        info = obj.get("info") or {}
+        if not isinstance(obj, dict):          # valid JSON but not an object → skip
+            continue
+        info = obj.get("info")
+        if not isinstance(info, dict):
+            info = {}
         target = obj.get("matched-at") or obj.get("host") or ""
+        if not isinstance(target, str):
+            target = ""
         tid = obj.get("template-id", "")
+        tid = tid if isinstance(tid, str) else ""
+        name = info.get("name") or tid
+        name = name if isinstance(name, str) and name else tid
+        sev = info.get("severity")
+        sev = sev if isinstance(sev, str) and sev else "unknown"
         details = {"template_id": tid, "matched_at": obj.get("matched-at"),
                    "type": obj.get("type")}
-        findings.append(Finding("vulnerability", target, info.get("name") or tid,
-                                info.get("severity") or "unknown", "nuclei",
+        findings.append(Finding("vulnerability", target, name, sev, "nuclei",
                                 details, ln, ts))
     return findings, []
 
@@ -73,11 +86,11 @@ PARSERS = {"subfinder": parse_subfinder, "httpx": parse_httpx, "nuclei": parse_n
 
 
 def save_findings(path: Path, findings: list[Finding]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps([asdict(f) for f in findings], indent=2))
+    from hackingtool.storage import write_json
+    write_json(path, [asdict(f) for f in findings], indent=2)
 
 
 def load_findings(path: Path) -> list[Finding]:
     if not path.exists():
         return []
-    return [Finding(**d) for d in json.loads(path.read_text())]
+    return [Finding(**d) for d in json.loads(path.read_text(encoding="utf-8"))]

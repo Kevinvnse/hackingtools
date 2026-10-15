@@ -124,6 +124,9 @@ def dispatch(raw, ctx):
 
     if raw.startswith("/"):
         parts = raw[1:].split(maxsplit=1)
+        if not parts:                      # bare "/" (or just whitespace) — show help, don't crash
+            cli.show_help()
+            return CONTINUE
         cmd = parts[0].lower()
         arg = parts[1].strip() if len(parts) > 1 else ""
         if cmd in ("quit", "q", "exit"):
@@ -262,8 +265,12 @@ def _run_command(arg, ctx):
 
         cwd = tool._get_tool_dir() or str(config.get_tools_dir())
         command = arg if arg != first else None  # bare tool name → prepared shell only
-        resolved = session.run(_slug(tool.TITLE), cwd, command=command,
-                                banner=_usage_banner(tool))
+        try:
+            resolved = session.run(_slug(tool.TITLE), cwd, command=command,
+                                    banner=_usage_banner(tool))
+        except session.SessionError as exc:
+            cli.console.print(f"[red]✘ Could not start background pane: {exc}[/red]")
+            return CONTINUE
         cli.console.print(
             f"[green]▶ started '{resolved}' in background — /attach to view[/green]")
         return CONTINUE
