@@ -31,17 +31,19 @@ def load() -> dict[str, Any]:
     """Load config from disk, merging with defaults for any missing keys."""
     if USER_CONFIG_FILE.exists():
         try:
-            on_disk = json.loads(USER_CONFIG_FILE.read_text())
+            on_disk = json.loads(USER_CONFIG_FILE.read_text(encoding="utf-8"))
+            if not isinstance(on_disk, dict):          # e.g. [], "x", 42 — not a config object
+                raise ValueError("config.json is not a JSON object")
             return {**DEFAULT_CONFIG, **on_disk}
-        except (json.JSONDecodeError, OSError) as exc:
+        except (ValueError, OSError) as exc:           # ValueError covers JSONDecodeError
             logger.warning("Config file unreadable (%s), using defaults.", exc)
     return dict(DEFAULT_CONFIG)
 
 
 def save(cfg: dict[str, Any]) -> None:
-    """Write config to disk, creating parent directories if needed."""
-    USER_CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
-    USER_CONFIG_FILE.write_text(json.dumps(cfg, indent=2, sort_keys=True))
+    """Write config to disk atomically, creating parent directories if needed."""
+    from hackingtool.storage import write_json
+    write_json(USER_CONFIG_FILE, cfg, indent=2, sort_keys=True)
 
 
 _ENV_TEMPLATE = """\
@@ -74,7 +76,7 @@ def ensure_user_files() -> None:
         save(dict(DEFAULT_CONFIG))
     env_file = USER_CONFIG_FILE.parent / ".env"
     if not env_file.exists():
-        env_file.write_text(_ENV_TEMPLATE)
+        env_file.write_text(_ENV_TEMPLATE, encoding="utf-8")
         try:
             env_file.chmod(0o600)      # secrets file — owner-only
         except OSError:
@@ -106,7 +108,7 @@ _ENUMS = {                                    # fixed string domains
     "ai_provider": {"auto", "ollama", "openai-compat"},
     "theme": set(THEME_CHOICES),              # applies on next launch
 }
-_BOOLS = {"show_archived"}                     # boolean-valued keys
+_BOOLS = {"show_archived", "update_check"}     # boolean-valued keys
 _TRUE = {"true", "on", "yes", "1"}
 _FALSE = {"false", "off", "no", "0"}
 
@@ -171,7 +173,10 @@ def set_value(key: str, value: str) -> tuple[bool, str]:
         coerced = low
     cfg = load()
     cfg[resolved] = coerced
-    save(cfg)
+    try:
+        save(cfg)
+    except OSError as exc:
+        return False, f"Could not save configuration: {exc}"
     return True, f"set {resolved} = {coerced}"
 
 
@@ -211,16 +216,19 @@ def set_ai_key(value: str) -> tuple[bool, str]:
     if "\n" in value or "\r" in value:
         return False, "API key can't contain newlines."
     env_file = USER_CONFIG_FILE.parent / ".env"
-    env_file.parent.mkdir(parents=True, exist_ok=True)
-    lines = env_file.read_text().splitlines() if env_file.exists() else _ENV_TEMPLATE.splitlines()
     new_line = f"HACKINGTOOL_AI_KEY={value}" if value else "# HACKINGTOOL_AI_KEY=sk-ant-your-key-here"
-    for i, line in enumerate(lines):
-        if line.lstrip("# ").startswith("HACKINGTOOL_AI_KEY="):
-            lines[i] = new_line
-            break
-    else:
-        lines.append(new_line)
-    env_file.write_text("\n".join(lines) + "\n")
+    try:
+        env_file.parent.mkdir(parents=True, exist_ok=True)
+        lines = env_file.read_text(encoding="utf-8").splitlines() if env_file.exists() else _ENV_TEMPLATE.splitlines()
+        for i, line in enumerate(lines):
+            if line.lstrip("# ").startswith("HACKINGTOOL_AI_KEY="):
+                lines[i] = new_line
+                break
+        else:
+            lines.append(new_line)
+        env_file.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        return False, f"Could not save API key: {type(exc).__name__}"   # never echo the secret
     try:
         env_file.chmod(0o600)                 # secrets file — owner-only
     except OSError:

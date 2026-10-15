@@ -36,7 +36,7 @@ class UpdateTool(HackingTool):
         console.print("  pipx     [success]pipx upgrade hackingtool[/success]")
         console.print("  pip      [success]pip install --upgrade hackingtool[/success]")
         console.print("  .deb     download the latest .deb, then [success]sudo apt install ./<file>.deb[/success]")
-        console.print("  docker   [success]docker pull ghcr.io/z4nzu/hackingtool:latest[/success]")
+        console.print("  docker   [success]docker pull hardikzinzu/hackingtool:latest[/success]")
         console.print(f"[dim]Latest release: {REPO_WEB_URL}/releases/latest[/dim]")
 
 
@@ -58,7 +58,7 @@ class UninstallTool(HackingTool):
         console.print("  pipx     [success]pipx uninstall hackingtool[/success]")
         console.print("  pip      [success]pip uninstall hackingtool[/success]")
         console.print("  .deb     [success]sudo apt remove python3-hackingtool[/success]")
-        console.print("  docker   [success]docker rmi ghcr.io/z4nzu/hackingtool:latest[/success]")
+        console.print("  docker   [success]docker rmi hardikzinzu/hackingtool:latest[/success]")
 
         if USER_CONFIG_DIR.exists() and Confirm.ask(
                 f"Remove your data + installed tools at {USER_CONFIG_DIR} now?", default=False):

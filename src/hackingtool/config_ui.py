@@ -12,6 +12,9 @@ gates on ``prompt._use_pt()`` and falls back to the read-only table.
 """
 from __future__ import annotations
 
+import asyncio
+import threading
+
 from hackingtool import config
 
 _PAGE = 5  # PgUp/PgDn jump size
@@ -204,12 +207,37 @@ def open_editor() -> None:
         state["msg"] = "cancelled"
         e.app.layout.focus(body)
 
+    probing = {"on": False}
+
     @kb.add("t", filter=nav)
     def _(e):
-        from hackingtool import ai_recommend
-        ok, detail = ai_recommend.test_connection()   # blocks briefly; manual action
-        mark = "✓ " if ok else "✗ "
-        state["msg"] = mark + (detail[:70] + "…" if len(detail) > 70 else detail)
+        # AI probe can block up to 30s on the network — run it off the UI loop so
+        # Escape/Ctrl-C stay responsive. Ignore repeat presses while one is in flight.
+        if probing["on"]:
+            return
+        probing["on"] = True
+        state["msg"] = "testing AI connection…"
+        app = e.app
+        loop = asyncio.get_running_loop()      # key handlers run on the app's event loop
+
+        def worker():
+            from hackingtool import ai_recommend
+            try:
+                ok, detail = ai_recommend.test_connection()
+                msg = ("✓ " if ok else "✗ ") + (detail[:70] + "…" if len(detail) > 70 else detail)
+            except Exception as exc:
+                msg = f"✗ probe error: {exc}"
+
+            def done():
+                probing["on"] = False
+                state["msg"] = msg
+                app.invalidate()
+            try:
+                loop.call_soon_threadsafe(done)
+            except RuntimeError:               # loop already closed (app exited mid-probe)
+                probing["on"] = False
+
+        threading.Thread(target=worker, daemon=True).start()
 
     @kb.add("escape", filter=nav, eager=True)
     @kb.add("c-c", filter=nav)

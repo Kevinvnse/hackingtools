@@ -604,7 +604,7 @@ def save_repo(repo: Repo, tags: list[str]) -> Path | None:
 
     path = _found_path()
     try:
-        data = yaml.safe_load(path.read_text()) or {}
+        data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     except (OSError, yaml.YAMLError):
         data = {}
     if not isinstance(data, dict):
@@ -628,8 +628,8 @@ def save_repo(repo: Repo, tags: list[str]) -> Path | None:
         "discovered": True,
     })
     try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(yaml.safe_dump(data, sort_keys=False))
+        from hackingtool.storage import write_text
+        write_text(path, yaml.safe_dump(data, sort_keys=False))   # atomic: never truncate saved discoveries
     except OSError:
         return None
     return path

@@ -66,16 +66,15 @@ class Engagement:
         self.save()
 
     def save(self) -> None:
-        self.workspace.mkdir(parents=True, exist_ok=True)
-        (self.workspace / "engagement.json").write_text(
-            json.dumps(asdict(self), indent=2))
+        from hackingtool.storage import write_json
+        write_json(self.workspace / "engagement.json", asdict(self), indent=2)
 
 
 def load(name: str) -> Engagement | None:
     f = ENGAGEMENTS_ROOT / name / "engagement.json"
     if not f.exists():
         return None
-    return Engagement(**json.loads(f.read_text()))
+    return Engagement(**json.loads(f.read_text(encoding="utf-8")))
 
 
 def create(name: str, targets: list[str] | None = None,

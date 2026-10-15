@@ -12,6 +12,11 @@ REPO_WEB_URL = f"https://github.com/{REPO_OWNER}/{REPO_NAME}"
 VERSION         = "3.0.0"
 VERSION_DISPLAY = f"v{VERSION}"
 
+# Maintainer-owned sponsor feed (fixed in code, NOT a user setting). Blank = committed
+# sponsors.yaml only, ZERO network. A maintainer sets this + cuts a release to enable
+# remote refresh; end users never point this anywhere.
+SPONSORS_URL = ""
+
 # ── Python requirement ────────────────────────────────────────────────────────
 MIN_PYTHON = (3, 10)
 
@@ -58,10 +63,11 @@ def _configured_theme() -> str:
     config-module import cycle). Unknown/missing → 'magenta'."""
     try:
         import json
-        name = json.loads(USER_CONFIG_FILE.read_text()).get("theme")
+        payload = json.loads(USER_CONFIG_FILE.read_text(encoding="utf-8"))
+        name = payload.get("theme") if isinstance(payload, dict) else None
     except (OSError, ValueError):
         name = None
-    return name if name in _PALETTES else "magenta"
+    return name if isinstance(name, str) and name in _PALETTES else "magenta"
 
 
 # THEME_HEX drives the prompt_toolkit REPL surface (prompt + rule); the rich
@@ -80,6 +86,7 @@ DEFAULT_CONFIG: dict = {
     "version":        VERSION,
     "theme":          "magenta",
     "show_archived":  False,
+    "update_check":   True,        # check GitHub once/day for a newer release on startup
     "background_runner": "auto",   # "auto" (on iff tmux present) | "off"
     "ai_provider":    "auto",      # "auto" (BYO-key if set, else Ollama) | "ollama" | "openai-compat"
     "ai_model":       "llama3",    # model name sent to the transport

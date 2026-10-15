@@ -134,7 +134,8 @@ def sanitize(finding) -> dict:
 
 def wrap_untrusted(text: str) -> str:
     """Frame untrusted tool output in the one <scan_data> delimiter used everywhere."""
-    return f"<scan_data>\n{text}\n</scan_data>"
+    safe = (text or "").replace("</scan_data>", "<\\/scan_data>")  # can't break out of the fence
+    return f"<scan_data>\n{safe}\n</scan_data>"
 
 
 def demo() -> None:
