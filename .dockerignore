@@ -5,8 +5,9 @@
 # GitHub / docs
 .github/
 images/
+# keep README.md: pyproject reads it during `pip install .` and the Dockerfile COPYs it
 *.md
-!README.md        # pyproject reads it during `pip install .`; Dockerfile COPYs it
+!README.md
 
 # Python cache
 __pycache__/
