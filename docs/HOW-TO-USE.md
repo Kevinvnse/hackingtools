@@ -7,6 +7,12 @@ and something you get back — no prior knowledge of the codebase needed.
 > written permission to test it. hackingtool never runs a step without asking you
 > first, and never invents results.
 
+> **TUI vs `--classic`.** The default `hackingtool` is an interactive TUI: browse
+> categories, type to search every tool, `↑↓`/`Enter`/`Esc` to move, `/` for the
+> command palette. The `/…`, `@…` and plain-English **grammar** taught below
+> (sections 2, 4, 5, 8) is the **`--classic`** REPL — launch it with
+> `hackingtool --classic`. Bringing these into the default TUI is Phase 2.
+
 - [1. First run](#1-first-run)
 - [2. Learn the grammar in 60 seconds](#2-learn-the-grammar-in-60-seconds)
 - [3. Open and install a tool](#3-open-and-install-a-tool)
@@ -47,9 +53,9 @@ and something you get back — no prior knowledge of the codebase needed.
    | `~/.hackingtool/history` | your `↑`/`↓` command history |
 
 4. You land on the banner + prompt. The header line tells you what you have:
-   OS, IP, and `22 categories · 217 active · 59 archived` (that count includes
+   OS, IP, and `22 categories · 219 active · 44 archived` (that count includes
    the built-in Update/Uninstall menu; the tool catalog itself is
-   [21 categories / 215 tools](TOOLS.md)).
+   [21 categories / 219 tools](TOOLS.md)).
 
 5. Type `/help` for the command card, and `q` (or `/quit`, `Ctrl-D`) to leave.
 
@@ -109,7 +115,7 @@ metapackages), hackingtool reuses that binary instead of re-cloning it.
 
 ## 4. Find a tool that isn't in the catalog (`/find`)
 
-`/find` answers "what should I use for X?" — first from the 215 curated tools,
+`/find` answers "what should I use for X?" — first from the 219 curated tools,
 then from the GitHub search API, ranked with a reason for each hit. It is
 **suggest-only**: it never clones, installs or runs anything, and it makes **zero
 model calls**.

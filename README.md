@@ -4,7 +4,7 @@
 
 ### AI-guided, all-in-one toolkit for authorized security testing
 
-**215 curated tools across 21 categories** — recon, OSINT, web, wireless, phishing,
+**219 curated tools across 21 categories** — recon, OSINT, web, wireless, phishing,
 forensics, post-exploitation and more — with an **AI layer that turns plain English
 into the right tool and the exact command**.
 
@@ -34,7 +34,7 @@ students — all working **legally, on systems they own or are authorised to tes
 
 <br/>
 
-![](https://img.shields.io/badge/21_Categories-7B61FF?style=for-the-badge&labelColor=0D1117) &nbsp;![](https://img.shields.io/badge/215_Tools-7B61FF?style=for-the-badge&labelColor=0D1117) &nbsp;![](https://img.shields.io/badge/63_Tags-7B61FF?style=for-the-badge&labelColor=0D1117) &nbsp;![](https://img.shields.io/badge/AI--Guided-7B61FF?style=for-the-badge&labelColor=0D1117&logo=openai&logoColor=white) &nbsp;![](https://img.shields.io/badge/Linux_%7C_Kali_%7C_Parrot_%7C_macOS-7B61FF?style=for-the-badge&labelColor=0D1117&logo=linux&logoColor=white)
+![](https://img.shields.io/badge/21_Categories-7B61FF?style=for-the-badge&labelColor=0D1117) &nbsp;![](https://img.shields.io/badge/219_Tools-7B61FF?style=for-the-badge&labelColor=0D1117) &nbsp;![](https://img.shields.io/badge/63_Tags-7B61FF?style=for-the-badge&labelColor=0D1117) &nbsp;![](https://img.shields.io/badge/AI--Guided-7B61FF?style=for-the-badge&labelColor=0D1117&logo=openai&logoColor=white) &nbsp;![](https://img.shields.io/badge/Linux_%7C_Kali_%7C_Parrot_%7C_macOS-7B61FF?style=for-the-badge&labelColor=0D1117&logo=linux&logoColor=white)
 
 <br/>
 
@@ -77,7 +77,7 @@ students — all working **legally, on systems they own or are authorised to tes
   plans an objective step by step, then summarizes findings and drafts an engagement
   report. Bring your own key or run a local model — nothing auto-executes and nothing
   is fabricated.
-- **🗂 215 curated tools, one interactive console** — type to search every tool, then
+- **🗂 219 curated tools, one interactive console** — type to search every tool, then
   install and run across 21 categories without hunting down Git repos; a fixed tag
   taxonomy (63 tags in use) makes every tool discoverable.
 - **🔎 It knows what it doesn't have** — `/find` searches your catalog first, then the
@@ -98,7 +98,7 @@ students — all working **legally, on systems they own or are authorised to tes
 
 ## Tool Categories
 
-**215 tools across 21 categories** — the full list, with links and tags, is in
+**219 tools across 21 categories** — the full list, with links and tags, is in
 **[docs/TOOLS.md](docs/TOOLS.md)**.
 
 <div align="center">
@@ -119,9 +119,9 @@ students — all working **legally, on systems they own or are authorised to tes
 
 </div>
 
-<sub>59 further entries are archived (unmaintained or dead upstream) and hidden unless
+<sub>44 further entries are archived (unmaintained or dead upstream) and hidden unless
 you set `show_archived true` via `/config`. The in-app header counts 22 categories /
-217 tools because it also counts the built-in Update / Uninstall menu.</sub>
+219 tools because it also counts the built-in Update / Uninstall menu.</sub>
 
 ---
 
@@ -328,9 +328,15 @@ falls back to the classic numbered menu, where `/` or `s` searches, `t` filters 
 
 ## Features
 
+> **Where these live today.** `/find`, `/goal`, plain-English recommendations,
+> `/tags`/`/search` and background panes currently run in the **`--classic`** REPL
+> (`hackingtool --classic`). The default TUI browses and type-searches the whole
+> catalog and runs tools; wiring these AI/search features into it is Phase 2. The
+> screenshots below showing a `/` command prompt are the `--classic` REPL.
+
 ### 🔎 `/find` — a tool for a need you don't have yet
 
-Searches the 215 curated tools first, then the GitHub search API, and ranks the
+Searches the 219 curated tools first, then the GitHub search API, and ranks the
 results explainably. **Suggest-only** — it never clones, installs or runs anything —
 and it makes **zero model calls**.
 
